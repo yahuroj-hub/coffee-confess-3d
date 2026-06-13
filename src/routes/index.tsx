@@ -256,6 +256,7 @@ function ConfessionOrder() {
   const [email, setEmail] = useState("");
   const [confession, setConfession] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [pendingOrder, setPendingOrder] = useState<{ id: string; total_cents: number } | null>(null);
   const submit = useServerFn(placeOrder);
 
   const total = cart.reduce((s, i) => s + i.price_cents * i.quantity, 0);
@@ -284,13 +285,17 @@ function ConfessionOrder() {
           items: cart.map((c) => ({ id: c.id, name: c.name, price_cents: c.price_cents, quantity: c.quantity })),
         },
       });
-      toast.success(`Order placed — total $${(res.total_cents / 100).toFixed(2)}. We'll have it ready.`);
-      setCart([]); setName(""); setEmail(""); setConfession("");
+      setPendingOrder({ id: res.id, total_cents: res.total_cents });
     } catch (err: any) {
       toast.error(err?.message ?? "Something went wrong");
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function handlePaid() {
+    setCart([]); setName(""); setEmail(""); setConfession("");
+    setPendingOrder(null);
   }
 
   return (

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { CoffeeScene } from "@/components/CoffeeScene";
+import { MockUpiCheckout } from "@/components/MockUpiCheckout";
 import { getMenu, placeOrder, type MenuItem } from "@/lib/menu.functions";
 import { toast } from "sonner";
 

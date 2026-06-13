@@ -58,9 +58,12 @@ export type Database = {
           customer_name: string
           id: string
           items: Json
+          paid_at: string | null
+          payment_method: string | null
           status: string
           stripe_session_id: string | null
           total_cents: number
+          upi_id: string | null
         }
         Insert: {
           confession?: string | null
@@ -69,9 +72,12 @@ export type Database = {
           customer_name: string
           id?: string
           items: Json
+          paid_at?: string | null
+          payment_method?: string | null
           status?: string
           stripe_session_id?: string | null
           total_cents: number
+          upi_id?: string | null
         }
         Update: {
           confession?: string | null
@@ -80,9 +86,12 @@ export type Database = {
           customer_name?: string
           id?: string
           items?: Json
+          paid_at?: string | null
+          payment_method?: string | null
           status?: string
           stripe_session_id?: string | null
           total_cents?: number
+          upi_id?: string | null
         }
         Relationships: []
       }

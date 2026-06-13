@@ -73,3 +73,26 @@ export const placeOrder = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { id: order.id, total_cents: order.total_cents };
   });
+
+const paymentSchema = z.object({
+  order_id: z.string().uuid(),
+  upi_id: z.string().trim().min(3).max(80).regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/, "Invalid UPI ID"),
+  success: z.boolean(),
+});
+
+export const confirmMockPayment = createServerFn({ method: "POST" })
+  .inputValidator((input) => paymentSchema.parse(input))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("orders")
+      .update({
+        status: data.success ? "paid" : "payment_failed",
+        payment_method: "mock_upi",
+        upi_id: data.upi_id,
+        paid_at: data.success ? new Date().toISOString() : null,
+      })
+      .eq("id", data.order_id);
+    if (error) throw new Error(error.message);
+    return { ok: data.success };
+  });

@@ -360,12 +360,19 @@ function ConfessionOrder() {
             <textarea maxLength={500} value={confession} onChange={(e) => setConfession(e.target.value)} placeholder="a small confession (optional)..." rows={3} className="w-full px-4 py-3 rounded-lg bg-background border border-input focus:outline-none focus:ring-2 focus:ring-ring text-sm font-script text-lg" />
 
             <button disabled={submitting} type="submit" className="w-full py-3 rounded-full bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity disabled:opacity-50">
-              {submitting ? "placing order..." : `place order · $${(total / 100).toFixed(2)}`}
+              {submitting ? "placing order..." : `pay with UPI · ₹${(total / 100).toFixed(2)}`}
             </button>
-            <p className="text-xs text-center text-muted-foreground">Payment at pickup. Card processing coming soon.</p>
+            <p className="text-xs text-center text-muted-foreground">Mock UPI checkout — demo mode, no real money.</p>
           </form>
         </div>
       </div>
+      <MockUpiCheckout
+        open={pendingOrder !== null}
+        onClose={() => setPendingOrder(null)}
+        orderId={pendingOrder?.id ?? null}
+        totalCents={pendingOrder?.total_cents ?? 0}
+        onPaid={handlePaid}
+      />
     </section>
   );
 }

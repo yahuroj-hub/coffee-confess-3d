@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import type { Database } from "@/integrations/supabase/types";
 
 export type MenuItem = {
   id: string;
@@ -11,9 +13,24 @@ export type MenuItem = {
   sort_order: number;
 };
 
+// Server-side client using the publishable (anon) key.
+// SUPABASE_SERVICE_ROLE_KEY is not available on Lovable Cloud, so we rely
+// on RLS policies instead. Created lazily inside handlers so process.env
+// is read at call time.
+function getServerSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) {
+    throw new Error("Missing SUPABASE_URL or SUPABASE_PUBLISHABLE_KEY");
+  }
+  return createClient<Database>(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
 export const getMenu = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
+  const supabase = getServerSupabase();
+  const { data, error } = await supabase
     .from("menu_items")
     .select("id, name, description, price_cents, category, emoji, sort_order")
     .eq("is_available", true)
@@ -39,11 +56,11 @@ const orderSchema = z.object({
 export const placeOrder = createServerFn({ method: "POST" })
   .inputValidator((input) => orderSchema.parse(input))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabase = getServerSupabase();
 
     // Re-price server-side from DB to prevent tampering
     const ids = data.items.map((i) => i.id);
-    const { data: rows, error: priceErr } = await supabaseAdmin
+    const { data: rows, error: priceErr } = await supabase
       .from("menu_items")
       .select("id, name, price_cents, is_available")
       .in("id", ids);
@@ -58,7 +75,7 @@ export const placeOrder = createServerFn({ method: "POST" })
       return { id: row.id, name: row.name, price_cents: row.price_cents, quantity: i.quantity };
     });
 
-    const { data: order, error } = await supabaseAdmin
+    const { data: order, error } = await supabase
       .from("orders")
       .insert({
         customer_name: data.customer_name,
@@ -83,8 +100,8 @@ const paymentSchema = z.object({
 export const confirmMockPayment = createServerFn({ method: "POST" })
   .inputValidator((input) => paymentSchema.parse(input))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const supabase = getServerSupabase();
+    const { error } = await supabase
       .from("orders")
       .update({
         status: data.success ? "paid" : "payment_failed",

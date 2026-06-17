@@ -7,6 +7,9 @@ export default defineConfig({
       entry: "server",
     },
   },
+  nitro: {
+    preset: "node-server", // Force standalone Node.js server build for production
+  },
   optimizeDeps: {
     exclude: ["@react-three/drei", "@react-three/fiber", "three"],
   },

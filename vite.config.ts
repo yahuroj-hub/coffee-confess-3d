@@ -7,4 +7,7 @@ export default defineConfig({
       entry: "server",
     },
   },
+  optimizeDeps: {
+    exclude: ["@react-three/drei", "@react-three/fiber", "three"],
+  },
 });

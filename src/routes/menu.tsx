@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
-import menuAsset from "@/assets/menu.jpg.asset.json";
 
 export const Route = createFileRoute("/menu")({
   head: () => ({
@@ -9,7 +8,7 @@ export const Route = createFileRoute("/menu")({
       { name: "description", content: "Baked daily, served with love — our full menu of croissants, cakes, cookies, and drinks." },
       { property: "og:title", content: "Menu — CoffeeConfess" },
       { property: "og:description", content: "Baked daily, served with love — our full menu of croissants, cakes, cookies, and drinks." },
-      { property: "og:image", content: menuAsset.url },
+      { property: "og:image", content: "/menu.jpg" },
     ],
   }),
   component: MenuPage,
@@ -41,7 +40,7 @@ function MenuPage() {
         }
       >
         <img
-          src={menuAsset.url}
+          src="/menu.jpg"
           alt="CafeConfess full menu — croissants, cakes, cookies, muffins, and drinks"
           className="mx-auto h-full w-full object-contain"
           draggable={false}

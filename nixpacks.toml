@@ -1,0 +1,7 @@
+# Force Nixpacks to use Node.js provider instead of Caddy/static
+# Force Nixpacks to use Node.js provider instead of Caddy/static
+[providers]
+node = {}
+
+[phases.setup]
+nixPkgs = ["nodejs"]
